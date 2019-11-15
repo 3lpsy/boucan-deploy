@@ -178,7 +178,7 @@ resource "null_resource" "save_ssh_locally" {
     public_key = tls_private_key.ssh.public_key_openssh
   }
   provisioner "local-exec" {
-    command = "echo '${tls_private_key.ssh.private_key_pem}' >> data/key.pem"
+    command = "echo '${tls_private_key.ssh.private_key_pem}' >> data/key.pem && chown 600 data/key.pem"
   }
 }
 
