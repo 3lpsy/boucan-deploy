@@ -1,6 +1,6 @@
 # Packer
 
-This directory contains the necessary configurations to build an AMI pre-baked with BountyDNS.
+This directory contains the necessary configurations to build an AMI pre-baked with Boucan.
 
 **Note: running the build will destroy any other AMIs that have the same name. You can increment the "version" variable to create duplicates.**
 

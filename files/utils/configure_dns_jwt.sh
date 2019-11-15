@@ -10,8 +10,8 @@ if [ -x "$(command -v jwtbin)" ]; then
     JWTBIN=$(command -v jwtbin);
 elif [[ -d "/usr/local/bin" && -f "/usr/local/bin/jwtbin" ]]; then
     JWTBIN="/usr/local/bin/jwtbin";
-elif [[ -d "/opt/bountydns" && -f "/opt/bountydns/infra/deploy/utils/jwtbin" ]]; then
-    JWTBIN="/opt/bountydns/infra/deploy/utils/jwtbin";
+elif [[ -d "/opt/boucan" && -f "/opt/boucan/infra/deploy/utils/jwtbin" ]]; then
+    JWTBIN="/opt/boucan/infra/deploy/utils/jwtbin";
 else
     SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )";
     if [[ -f "$SCRIPTPATH/jwtbin/jwtbin" ]]; then
@@ -25,7 +25,7 @@ else
 fi
 
 # We need a source file containing API_SECRET_KEY to generate the jwt
-SOURCE_FILE=${1:-/etc/bountydns/env/api.prod.env}
+SOURCE_FILE=${1:-/etc/boucan/env/api.prod.env}
 if [[ ! -f "$SOURCE_FILE" ]]; then
     echo "No source file found for $SOURCE_FILE. Failing.";
     exit 1;
@@ -43,7 +43,7 @@ TOKEN=$($JWTBIN -c 'dns_server_name:default' -c 'sub:1' -c 'scopes:profile dns-r
 unset JWT_SECRET;
 
 # Add the JWT token to the target file using API_TOKEN as the key
-TARGET_FILE=${2:-/etc/bountydns/env/dns.prod.env};
+TARGET_FILE=${2:-/etc/boucan/env/dns.prod.env};
 
 if [[ ! -f "$TARGET_FILE" ]]; then
     echo "No target file found for $TARGET_FILE. Failing.";

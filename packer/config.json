@@ -3,7 +3,7 @@
     "region": "{{ env `PACKER_REGION` }}",
     "vpc_id": "{{ env `PACKER_VPC_ID` }}",
     "subnet_id": "{{ env `PACKER_SUBNET_ID` }}",
-    "name": "bountydns",
+    "name": "boucan",
     "version": "0.0.1",
     "ssh_username": "ubuntu",
     "profile_name": "{{ env `PACKER_AWS_PROFILE_NAME` }}"

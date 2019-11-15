@@ -15,7 +15,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   tags = {
-    Name = "bountydns-vpc"
+    Name = "boucan-vpc"
   }
 }
 
@@ -23,7 +23,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = "${aws_vpc.main.id}"
 
   tags = {
-    Name = "bountydns-ig"
+    Name = "boucan-ig"
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_subnet" "main" {
   cidr_block = "${cidrsubnet(aws_vpc.main.cidr_block, 8, 0)}"
 
   tags = {
-    Name = "bountydns-subnet"
+    Name = "boucan-subnet"
   }
 }
 
@@ -42,7 +42,7 @@ resource "aws_network_acl" "main" {
   subnet_ids = ["${aws_subnet.main.id}"]
 
   tags = {
-    Name = "bountydns-acl"
+    Name = "boucan-acl"
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_route_table" "main" {
   vpc_id = "${aws_vpc.main.id}"
 
   tags = {
-    Name = "bountydns-rt"
+    Name = "boucan-rt"
   }
 }
 
@@ -92,8 +92,8 @@ resource "aws_route_table_association" "main" {
 ### Security Groups 
 
 resource "aws_security_group" "main" {
-  name        = "bountydns-sg"
-  description = "A Generica Security Group for a BountyDNS Server"
+  name        = "boucan-sg"
+  description = "A Generica Security Group for a Boucan Server"
   vpc_id      = "${aws_vpc.main.id}"
 }
 
@@ -177,7 +177,7 @@ resource "aws_security_group_rule" "all_outbound" {
 #### Pull latest ami
 
 resource "aws_key_pair" "main" {
-  key_name   = "bountydns-key"
+  key_name   = "boucan-key"
   public_key = "${file("${path.root}/data/key.pem.pub")}"
 }
 
@@ -190,7 +190,7 @@ resource "aws_instance" "main" {
 
   associate_public_ip_address = true
   tags = {
-    Name = "bountydns-server"
+    Name = "boucan-server"
   }
 }
 
@@ -241,7 +241,7 @@ SSL_ENABLED=1
 INSECURE_LISTEN_PORT=8080
 SECURE_LISTEN_PORT=8443
 API_BACKEND_PROTO=http
-API_BACKEND_HOST=bountydns
+API_BACKEND_HOST=boucan
 API_BACKEND_PORT=8080
 DEBUG_CONF=1
 EOT
@@ -317,12 +317,12 @@ resource "null_resource" "server_configure" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo '${data.template_file.api_env.rendered}' | sudo tee /etc/bountydns/env/api.prod.env > /dev/null",
-      "echo '${data.template_file.db_env.rendered}' | sudo tee /etc/bountydns/env/db.prod.env > /dev/null",
-      "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/bountydns/env/proxy.prod.env > /dev/null",
-      "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/bountydns/env/broadcast.prod.env > /dev/null",
-      "echo '${data.template_file.dns_env.rendered}' | sudo tee /etc/bountydns/env/dns.prod.env > /dev/null",
-      "sudo bash /opt/bountydns/infra/deploy/utils/configure_dns_jwt.sh /etc/bountydns/env/api.prod.env /etc/bountydns/env/dns.prod.env > /dev/null"
+      "echo '${data.template_file.api_env.rendered}' | sudo tee /etc/boucan/env/api.prod.env > /dev/null",
+      "echo '${data.template_file.db_env.rendered}' | sudo tee /etc/boucan/env/db.prod.env > /dev/null",
+      "echo '${data.template_file.proxy_env.rendered}' | sudo tee /etc/boucan/env/proxy.prod.env > /dev/null",
+      "echo '${data.template_file.broadcast_env.rendered}' | sudo tee /etc/boucan/env/broadcast.prod.env > /dev/null",
+      "echo '${data.template_file.dns_env.rendered}' | sudo tee /etc/boucan/env/dns.prod.env > /dev/null",
+      "sudo bash /opt/boucan/infra/deploy/utils/configure_dns_jwt.sh /etc/boucan/env/api.prod.env /etc/boucan/env/dns.prod.env > /dev/null"
     ]
   }
 }
@@ -461,10 +461,10 @@ resource "null_resource" "setup_tls" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /etc/letsencrypt/live/bountydns.proxy.docker",
-      "echo '${replace(tls_private_key.dashboard_cert_private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/privkey.pem > /dev/null",
-      "echo '${replace(acme_certificate.dashboard_certificate.certificate_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem > /dev/null",
-      "echo '${replace(acme_certificate.dashboard_certificate.issuer_pem, "\n", "\\n")}' | sudo tee -a /etc/letsencrypt/live/bountydns.proxy.docker/fullchain.pem > /dev/null"
+      "sudo mkdir -p /etc/letsencrypt/live/boucan.proxy.docker",
+      "echo '${replace(tls_private_key.dashboard_cert_private_key.private_key_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/boucan.proxy.docker/privkey.pem > /dev/null",
+      "echo '${replace(acme_certificate.dashboard_certificate.certificate_pem, "\n", "\\n")}' | sudo tee /etc/letsencrypt/live/boucan.proxy.docker/fullchain.pem > /dev/null",
+      "echo '${replace(acme_certificate.dashboard_certificate.issuer_pem, "\n", "\\n")}' | sudo tee -a /etc/letsencrypt/live/boucan.proxy.docker/fullchain.pem > /dev/null"
     ]
   }
 }
@@ -493,8 +493,8 @@ resource "null_resource" "restart_service" {
       "echo '127.0.0.1 ${var.dns_dashboard_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
       "echo '127.0.0.1 ${var.dns_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${var.dns_dashboard_sub}.${var.dns_root}",
-      "sudo systemctl enable bountydns-compose",
-      "sudo systemctl restart bountydns-compose"
+      "sudo systemctl enable boucan-compose",
+      "sudo systemctl restart boucan-compose"
     ]
   }
 }
