@@ -99,7 +99,7 @@ resource "aws_security_group_rule" "dashboard_ingress" {
   security_group_id = aws_security_group.main.id
   type              = "ingress"
   protocol          = "tcp"
-  cidr_blocks       = [var.trusted_external_cidr_block]
+  cidr_blocks       = var.trusted_external_cidr_block
   from_port         = 8080
   to_port           = 8080
 }
@@ -108,7 +108,7 @@ resource "aws_security_group_rule" "dashboard_ingress_https" {
   security_group_id = aws_security_group.main.id
   type              = "ingress"
   protocol          = "tcp"
-  cidr_blocks       = [var.trusted_external_cidr_block]
+  cidr_blocks       = var.trusted_external_cidr_block
   from_port         = 8443
   to_port           = 8443
 }
@@ -117,7 +117,7 @@ resource "aws_security_group_rule" "ssh_ingress" {
   security_group_id = aws_security_group.main.id
   type              = "ingress"
   protocol          = "tcp"
-  cidr_blocks       = [var.trusted_external_cidr_block]
+  cidr_blocks       = var.trusted_external_cidr_block
   from_port         = 22
   to_port           = 22
 }

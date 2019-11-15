@@ -35,6 +35,7 @@ variable "dns_dashboard_sub" {
 }
 
 variable "trusted_external_cidr_block" {
+  type = list(string)
 }
 
 variable "internet_cidr_block" {
