@@ -39,7 +39,10 @@
       "type": "shell",
       "inline": [
         "sudo mkdir /tmp/provisioners",
-        "sudo chown {{user `ssh_username`}}:{{user `ssh_username`}} /tmp/provisioners"
+        "sudo chown {{user `ssh_username`}}:{{user `ssh_username`}} /tmp/provisioners",
+        "sudo mkdir /tmp/files",
+        "sudo chown {{user `ssh_username`}}:{{user `ssh_username`}} /tmp/files",
+        "sudo mkdir /opt/boucan"
       ]
     },
     {
@@ -48,10 +51,14 @@
       "source": "./provisioners/"
     },
     {
+      "type": "file",
+      "destination": "/tmp/files/",
+      "source": "./../files/"
+    },
+    {
       "type": "shell",
       "inline": [
         "sudo bash /tmp/provisioners/provision.sh",
-        "sudo bash /tmp/provisioners/provision.jwtbin.sh",
         "sudo bash /tmp/provisioners/provision.docker.sh",
         "sudo bash /tmp/provisioners/provision.docker-compose.sh",
         "sudo bash /tmp/provisioners/provision.bdns-dl.sh",

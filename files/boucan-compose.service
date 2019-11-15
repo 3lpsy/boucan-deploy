@@ -6,20 +6,20 @@ After=docker.service
 [Service]
 Restart=always
 
-WorkingDirectory=/opt/boucan
+WorkingDirectory=/opt/boucan/boucan-compose
 
 # Remove old containers, images and volumes
-ExecStartPre=/opt/boucan/compose.sh prod down -v
-ExecStartPre=/opt/boucan/compose.sh prod rm -fv
+ExecStartPre=/opt/boucan/boucan-compose/compose.sh prod down -v
+ExecStartPre=/opt/boucan/boucan-compose/compose.sh prod rm -fv
 ExecStartPre=-/bin/bash -c 'docker volume ls -qf "name=boucan_" | xargs docker volume rm'
 ExecStartPre=-/bin/bash -c 'docker network ls -qf "name=boucan_" | xargs docker network rm'
 ExecStartPre=-/bin/bash -c 'docker ps -aqf "name=boucan_*" | xargs docker rm'
 
 # Compose up
-ExecStart=/opt/boucan/compose.sh prod up
+ExecStart=/opt/boucan/boucan-compose/compose.sh prod up
 
 # Compose down, remove containers and volumes
-ExecStop=/opt/boucan/compose.sh prod down -v
+ExecStop=/opt/boucan/boucan-compose/compose.sh prod down -v
 
 [Install]
 WantedBy=multi-user.target

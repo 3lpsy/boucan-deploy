@@ -10,7 +10,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get clean
 sudo DEBIAN_FRONTEND=noninteractive apt update
 
 echo "Provisioning: Base - Installing Base Packages"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git apt-transport-https ca-certificates curl software-properties-common
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git apt-transport-https ca-certificates curl software-properties-common python3 python3-jwt
 
 sudo hostnamectl set-hostname bdns
 echo -n "bdns" | sudo tee /etc/hostname;
