@@ -65,7 +65,7 @@ $ terraform plan
 $ terraform apply
 ```
 
-Hopefully everything works!
+Hopefully everything works! If it doesn't, you can ssh in using the ssh key at data/key.pem and examine the "boucan-compose" systemd service.
 
 ### Limitations
 
