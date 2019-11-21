@@ -1,0 +1,122 @@
+# you will need to build bug menace yourself: https://github.com/3lpsy/bugmenace
+# do not use this file unless you want to use bugmenace
+# the default image is t2.medium, but there is an iam user created and hints on commands to run to
+# turn the system off when not in use to save money 
+
+# running this will print sensitive data to the screen 
+
+# set the ami here after building it
+variable "bugmenace_ami" {
+  default = ""
+}
+
+resource "aws_instance" "bugmenace" {
+  ami                    = var.bugmenace_ami
+  instance_type          = "t2.medium"
+  subnet_id              = aws_subnet.main.id
+  vpc_security_group_ids = [aws_security_group.main.id]
+  key_name               = aws_key_pair.main.key_name
+  # associate_public_ip_address = true
+
+  root_block_device {
+    volume_size = 16
+  }
+  tags = {
+    Name = "bugmenace-server"
+  }
+}
+
+
+resource "aws_eip" "eip" {
+  vpc      = true
+  instance = aws_instance.bugmenace.id
+}
+
+resource "aws_route53_record" "a_menace" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "menace.${var.dns_root}"
+  type    = "A"
+  ttl     = "5"
+  records = [aws_eip.eip.public_ip]
+}
+
+resource "aws_iam_user" "power_manage_user" {
+  name = "BugMenacePowerManager"
+  path = "/"
+}
+
+resource "aws_iam_policy" "power_manage_policy" {
+  name        = "BugMenacePowerManagePolicy"
+  description = "Start/Stop the BugMenace"
+  policy      = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "ec2:StartInstances",
+                  "ec2:StopInstances"
+              ],
+              "Resource": "${aws_instance.bugmenace.arn}",
+              "Condition": {
+                "ForAnyValue:IpAddress": {
+                  "aws:SourceIp": ${jsonencode(var.trusted_external_cidr_block)}
+                }
+              }
+          },
+          {
+              "Effect": "Allow",
+              "Action": "ec2:DescribeInstances",
+              "Resource": "*"
+          }
+      ]
+  }
+EOF
+
+}
+
+
+resource "aws_iam_policy_attachment" "power_manage_policy_attach" {
+  name       = "BugMenacePowerManagePolicyAttach"
+  users      = [aws_iam_user.power_manage_user.name]
+  policy_arn = aws_iam_policy.power_manage_policy.arn
+}
+
+resource "aws_iam_access_key" "power_manage_key" {
+  user = aws_iam_user.power_manage_user.name
+}
+
+output "bugmenace_pm_access_id" {
+  value = "${aws_iam_access_key.power_manage_key.id}"
+}
+
+output "bugmenace_pm_access_secret" {
+  value = "${aws_iam_access_key.power_manage_key.secret}"
+}
+
+
+output "bugmenace_command_start" {
+  value = "aws --region ${var.aws_default_region} --profile bugmenace-pm ec2 start-instances --instance-ids ${aws_instance.bugmenace.id}"
+}
+
+output "bugmenace_command_stop" {
+  value = "aws --region ${var.aws_default_region} --profile bugmenace-pm ec2 stop-instances --instance-ids ${aws_instance.bugmenace.id}"
+}
+
+output "bugmenace_command_state" {
+  value = "aws --region ${var.aws_default_region} --profile bugmenace-pm ec2 describe-instances --instance-ids ${aws_instance.bugmenace.id} --query 'Reservations[*].Instances[*].State'"
+}
+
+output "bugmenace_domain" {
+  value = "menace.${var.dns_root}"
+}
+
+output "bugmenace_ssh_command" {
+  value = "ssh -i data/key.pem ubuntu@${aws_instance.bugmenace.public_ip}"
+}
+
+output "bugmenace_notes" {
+  value = "The bug menace server uses a t2.large. Best not to keep this running for too long. You can use the IAM user created to spin the bug menace instance up and down from the CLI when not in use to save money. Add the iam creds to your .aws/credentials file with the profile name bugmenace-pm. You should probably make bash functions to make this easiest."
+}
+

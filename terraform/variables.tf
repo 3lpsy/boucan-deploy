@@ -38,6 +38,10 @@ variable "trusted_external_cidr_block" {
   type = list(string)
 }
 
+variable "wireguard_port" {
+  default = 36283
+}
+
 variable "internet_cidr_block" {
 }
 

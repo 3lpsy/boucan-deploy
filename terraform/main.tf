@@ -122,6 +122,25 @@ resource "aws_security_group_rule" "ssh_ingress" {
   to_port           = 22
 }
 
+resource "aws_security_group_rule" "wireguard_ingress" {
+  security_group_id = aws_security_group.main.id
+  type              = "ingress"
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = var.wireguard_port
+  to_port           = var.wireguard_port
+}
+
+
+resource "aws_security_group_rule" "wireguard_ingress_udp" {
+  security_group_id = aws_security_group.main.id
+  type              = "ingress"
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  from_port         = var.wireguard_port
+  to_port           = var.wireguard_port
+}
+
 resource "aws_security_group_rule" "http_ingress" {
   security_group_id = aws_security_group.main.id
   type              = "ingress"
@@ -158,13 +177,31 @@ resource "aws_security_group_rule" "dns_udp_ingress" {
   to_port           = 53
 }
 
-resource "aws_security_group_rule" "all_outbound" {
+resource "aws_security_group_rule" "all_outbound_tcp" {
   security_group_id = aws_security_group.main.id
   type              = "egress"
-  protocol          = "-1"
+  protocol          = "tcp"
   cidr_blocks       = [var.internet_cidr_block]
   from_port         = 0
   to_port           = 65535
+}
+
+resource "aws_security_group_rule" "all_outbound_udp" {
+  security_group_id = aws_security_group.main.id
+  type              = "egress"
+  protocol          = "udp"
+  cidr_blocks       = [var.internet_cidr_block]
+  from_port         = 0
+  to_port           = 65535
+}
+
+resource "aws_security_group_rule" "all_outbound_icmp" {
+  security_group_id = aws_security_group.main.id
+  type              = "egress"
+  protocol          = "icmp"
+  cidr_blocks       = [var.internet_cidr_block]
+  from_port         = 0
+  to_port           = 8
 }
 
 ### EC2(s)
