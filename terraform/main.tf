@@ -557,7 +557,7 @@ resource "null_resource" "restart_service" {
       "echo '127.0.0.1 ${var.dns_dashboard_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
       "echo '127.0.0.1 ${var.dns_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${var.dns_dashboard_sub}.${var.dns_root}",
-      "cd /etc/boucan/boucan-compose && sudo git pull origin master",
+      "cd /opt/boucan/boucan-compose && sudo git pull origin master",
       "sudo systemctl enable boucan-compose",
       "sudo systemctl restart boucan-compose",
     ]
