@@ -232,6 +232,7 @@ resource "aws_instance" "main" {
   key_name               = aws_key_pair.main.key_name
 
   associate_public_ip_address = true
+
   tags = {
     Name = "boucan-server"
   }
@@ -556,6 +557,7 @@ resource "null_resource" "restart_service" {
       "echo '127.0.0.1 ${var.dns_dashboard_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
       "echo '127.0.0.1 ${var.dns_sub}.${var.dns_root}' | sudo tee -a /etc/hosts",
       "sudo hostnamectl set-hostname ${var.dns_dashboard_sub}.${var.dns_root}",
+      "cd /etc/boucan/boucan-compose && sudo git pull origin master",
       "sudo systemctl enable boucan-compose",
       "sudo systemctl restart boucan-compose",
     ]
